@@ -1,5 +1,7 @@
 using System;
 using System.Windows.Forms;
+using stringb = System.Text.StringBuilder;
+using GCol = System.Collections.Generic;
 
 namespace Root.Forms
 {
@@ -13,9 +15,10 @@ namespace Root.Forms
 		Root.IMaskeable _type;
 		string _mask;
 		Strings.IndexedChar[] _autoChars;
-		System.Text.StringBuilder _tempMask;
-		System.Text.StringBuilder _base;
+		stringb _tempMask;
+		stringb _base;
 		UserInputBasedControl _uibCtrl;
+		GCol.Dictionary<Control, stringb> _ctrls;
 		bool _isBack;
 
 		#endregion
@@ -66,6 +69,9 @@ namespace Root.Forms
 
 		#region Public Methods
 
+		/// <overloads>
+		/// Applies input restriction for specified Control.
+		/// </overloads>
 		/// <summary>
 		/// Applies input restriction for the specified TextBoxBase.
 		/// </summary>
@@ -130,11 +136,13 @@ namespace Root.Forms
 			ctrl.TextChanged += new EventHandler(ctrl_TextChanged);
 			ctrl.Leave += new EventHandler(ctrl_Leave);
 			ctrl.Text = string.Empty;
+			
+			_ctrls.Add(ctrl, new stringb(_mask.Length));
 		}
 
 		private void ctrl_Leave(object sender, EventArgs e)
 		{
-			_uibCtrl.SetControl(sender);
+			_uibCtrl.SetControl((Control)sender);
 			if (_type.IsMatch(_uibCtrl.Text))
 			{
 				if (ValidLeave != null)
@@ -149,9 +157,10 @@ namespace Root.Forms
 
 		private void ctrl_KeyPress(object sender, KeyPressEventArgs e)
 		{
-			_uibCtrl.SetControl(sender);
+			_uibCtrl.SetControl((Control)sender);
 
 			int txtSel = _uibCtrl.SelectionStart;
+			int txtSelLen = _uibCtrl.SelectionLength;
 
 			_base.Remove(0, _base.Length);	// Clears string
 			_base.Append(_uibCtrl.Text);		// Stores textbase text contents
@@ -212,7 +221,10 @@ namespace Root.Forms
 
 		private void ctrl_TextChanged(object sender, EventArgs e)
 		{
-			_uibCtrl.SetControl(sender);
+			_uibCtrl.SetControl((Control)sender);
+			
+			string newText = _uibCtrl.Text;
+			Strings.AdditionalChars(newText, _ctrls[(Control)sender].ToString());
 
 			_tempMask.Remove(0, _tempMask.Length);	// Clears string
 			_tempMask.Append(_mask);				// Stores _mask
@@ -288,6 +300,24 @@ namespace Root.Forms
 				set { ctrl.Text = value; }
 			}
 
+			public int SelectionLength
+			{
+				get
+				{
+					if (txt != null)
+						return txt.SelectionLength;
+					else
+						return cmb.SelectionLength;
+				}
+				set
+				{
+					if (txt != null)
+						txt.SelectionLength = value;
+					else
+						cmb.SelectionLength = value;
+				}
+			}
+			
 			public int SelectionStart
 			{
 				get
