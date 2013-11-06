@@ -66,6 +66,9 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <ItemGroup>
+    <Reference Include="SklLib">
+      <HintPath>..\References\skllib\SklLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -83,11 +86,5 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>resExceptions.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SklLib\SklLib.csproj">
-      <Project>{9F7E3C8B-264E-4E7E-B9DE-7845E7232520}</Project>
-      <Name>SklLib</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>
